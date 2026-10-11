@@ -20,6 +20,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import java.util.ArrayList;
 import java.util.List;
 
 @Configuration
@@ -48,9 +49,15 @@ public class SecurityConfig {
     }
 
     @Bean
-    CorsConfigurationSource corsConfigurationSource(@Value("${app.cors.allowed-origins}") List<String> origins) {
+    CorsConfigurationSource corsConfigurationSource(
+            @Value("${app.cors.allowed-origins}") List<String> origins,
+            @Value("${app.cors.frontend-origin:https://smart-internship-management-system-5043.onrender.com}") String frontendOrigin) {
         CorsConfiguration c = new CorsConfiguration();
-        c.setAllowedOrigins(origins);
+        List<String> allowedOrigins = new ArrayList<>(origins);
+        if (!allowedOrigins.contains(frontendOrigin)) {
+            allowedOrigins.add(frontendOrigin);
+        }
+        c.setAllowedOrigins(allowedOrigins);
         c.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         c.setAllowedHeaders(List.of("*"));
         c.setExposedHeaders(List.of("Content-Disposition"));
